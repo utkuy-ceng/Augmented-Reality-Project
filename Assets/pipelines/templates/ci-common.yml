@@ -1,0 +1,22 @@
+# CI build for developer builds.
+parameters:
+  packagingEnabled: true
+  packagePublishing: true
+  UnityVersion: ""
+
+steps:
+- template: common.yml
+  parameters:
+    buildUWPDotNet: false
+    UnityVersion: ${{ parameters.UnityVersion }}
+- template: compilemsbuild.yml
+  parameters:
+    UnityVersion: ${{ parameters.UnityVersion }}
+- ${{ if eq(parameters.packagingEnabled, true) }}:
+  - template: tasks/unitypackages.yml
+    parameters:
+      UnityVersion: ${{ parameters.UnityVersion }}
+  - template: package.yml
+  - ${{ if eq(parameters.packagePublishing, true) }}:
+    - template: publishpackages.yml
+- template: end.yml
